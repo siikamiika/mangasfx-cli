@@ -46,13 +46,16 @@ def print_result(res):
         return ''
 
     for i in range(height):
-        print('{} | {} | {}'.format(
-            *[safe_idx(res[a], i).ljust(widths[a])
-                for a in ['romaji', 'english', 'explanation']]
-        ))
+        print('{} | {} | {}'.format(*[
+            safe_idx(res[a], i).ljust(widths[a])
+            for a in ['romaji', 'english', 'explanation']
+        ]))
 
 
 def search(translations, query):
+
+    if not query:
+        return
 
     search_mode = 'romaji'
 
@@ -87,13 +90,17 @@ def search(translations, query):
         for i, r in enumerate(results):
             info.append('{}: {}'.format(i, r['japanese'][search_mode].replace(',', '')))
 
-        idx = input('\n'.join(info) + '\n')
+        idx = input('\n'.join(info) + '\nIndex? [0]>')
         try:
             idx = int(idx)
         except ValueError:
-            idx = 0
+            if not idx:
+                idx = 0
 
-        print_result(results[idx])
+        try:
+            print_result(results[idx])
+        except (IndexError, TypeError):
+            print('Invalid index')
 
     else:
         print('No results')
@@ -113,7 +120,7 @@ def main():
 
     else:
         while True:
-            search(translations, input('\n'))
+            search(translations, input('\n>'))
 
 
 if __name__ == '__main__':
