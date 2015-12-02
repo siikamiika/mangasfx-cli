@@ -26,7 +26,6 @@ def print_result(res):
     res['explanation'] = expl
 
     height = max(
-        len(res['romaji']),
         len(res['english']),
         len(res['explanation']),
         )
@@ -35,7 +34,6 @@ def print_result(res):
         return max([len(r) for r in res[a]] + [0])
 
     widths = {
-        'romaji': w('romaji'),
         'english': w('english'),
         'explanation': w('explanation'),
     }
@@ -46,9 +44,9 @@ def print_result(res):
         return ''
 
     for i in range(height):
-        print('{} | {} | {}'.format(*[
+        print('{} | {}'.format(*[
             safe_idx(res[a], i).ljust(widths[a])
-            for a in ['romaji', 'english', 'explanation']
+            for a in ['english', 'explanation']
         ]))
 
 
@@ -98,6 +96,7 @@ def search(translations, query):
                 idx = 0
 
         try:
+            print(results[idx]['romaji'][0])
             print_result(results[idx])
         except (IndexError, TypeError):
             print('Invalid index')
