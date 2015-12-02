@@ -32,7 +32,7 @@ def print_result(res):
         )
 
     def w(a):
-        return max(len(r) for r in res[a])
+        return max([len(r) for r in res[a]] + [0])
 
     widths = {
         'romaji': w('romaji'),
