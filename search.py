@@ -3,27 +3,37 @@
 import json
 import sys
 
-def print_result(res):
+def squeeze(lines, width=40):
+    new = []
 
-    expl = []
-
-    for r in res['explanation']:
-        if len(r) > 40:
+    for l in lines:
+        if len(l) > width:
             buf = []
-            for w in r.split():
-                if len(' '.join(buf) + w) < 40:
+            for w in l.split():
+                if len(' '.join(buf) + w) < width:
                     buf.append(w)
                 else:
-                    expl.append(' '.join(buf))
+                    if buf:
+                        new.append(' '.join(buf))
                     buf = [w]
             if buf:
-                expl.append(' '.join(buf))
-        elif not r or '»' in r:
+                new.append(' '.join(buf))
+        elif not l or '»' in l:
             continue
         else:
-            expl.append(r)
+            new.append(l)
 
-    res['explanation'] = expl
+    return new
+
+
+def print_result(res):
+
+    jpn = res['japanese'][:2]
+    romaji = res['romaji'][0]
+    print(', '.join([kana.replace(',', '') for kana in jpn] + [romaji]))
+
+    for attr in 'english', 'explanation':
+        res[attr] = squeeze(res[attr])
 
     height = max(
         len(res['english']),
@@ -75,9 +85,8 @@ def search(translations, query):
 
     results = sorted(results, key=lambda r: r['japanese'][0].replace(',', ''))
 
+    # result
     if len(results) == 1:
-        if search_mode == 'romaji':
-            print(results[0]['japanese'][0].replace(',', ''))
         print_result(results[0])
 
     elif len(results) > 1:
@@ -85,6 +94,7 @@ def search(translations, query):
             search_mode = 0
 
         info = []
+
         for i, r in enumerate(results):
             info.append('{}: {}'.format(i, r['japanese'][search_mode].replace(',', '')))
 
@@ -96,7 +106,6 @@ def search(translations, query):
                 idx = 0
 
         try:
-            print(results[idx]['romaji'][0])
             print_result(results[idx])
         except (IndexError, TypeError):
             print('Invalid index')
